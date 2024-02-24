@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../firebase/firebase-config";
+import { createUserWithEmailAndPassword } from "firebase/auth"; // Only import createUserWithEmailAndPassword from "firebase/auth"
 import { useNavigation } from "@react-navigation/native";
+import { collection, addDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebase-config"; // Import only db from your firebase-config
 
 const CadastroScreen = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +22,7 @@ const CadastroScreen = () => {
     return unsubscribe;
   }, []);
 
-  const handleSingUp = () => {
+  const handleSignUp = async () => {
     // Verificar se as senhas coincidem
     if (password !== password2) {
       alert("As senhas não coincidem.");
@@ -32,14 +30,30 @@ const CadastroScreen = () => {
     }
 
     // Se as senhas coincidirem, proceda com o cadastro
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Cadastrado:", user.email);
-        // Adicione feedback ao usuário ou navegue para a tela desejada
-        // Exemplo: navigation.replace("Home");
-      })
-      .catch((error) => alert(error.message));
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredentials.user;
+      console.log("Cadastrado, email:", user.email);
+      console.log("Cadastrado, user:", user);
+
+      // Criar uma coleção específica para o usuário recém-cadastrado
+      const userTasksCollectionRef = collection(db, `users/${user.uid}/tasks`);
+
+      // Adicione uma tarefa de exemplo, se desejar
+      await addDoc(userTasksCollectionRef, {
+        titulo: "Exemplo de Tarefa",
+        conteudo: "Esta é uma tarefa de exemplo.",
+      });
+
+      // Adicione feedback ao usuário ou navegue para a tela desejada
+      // Exemplo: navigation.replace("Home");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -71,19 +85,12 @@ const CadastroScreen = () => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={handleSingUp}
+          onPress={handleSignUp}
           style={[styles.button, styles.buttonOutline]}
         >
           <Text style={styles.buttonOutlineText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity
-        style={styles.buttonLogin}
-        onPress={() => navigation.replace("Login")}
-      >
-        <Text>Já tem uma conta? Logar</Text>
-      </TouchableOpacity>
     </View>
   );
 };

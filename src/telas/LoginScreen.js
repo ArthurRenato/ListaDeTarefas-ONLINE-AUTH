@@ -49,6 +49,12 @@ const LoginScreen = () => {
           style={styles.input}
           secureTextEntry
         ></TextInput>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Recuperar Senha")}
+        >
+          <Text>Recuperar senha</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -58,7 +64,7 @@ const LoginScreen = () => {
 
         <TouchableOpacity
           style={styles.buttonCadastro}
-          onPress={() => navigation.replace("Cadastro")}
+          onPress={() => navigation.navigate("Cadastro")}
         >
           <Text>Cadastrar-se</Text>
         </TouchableOpacity>

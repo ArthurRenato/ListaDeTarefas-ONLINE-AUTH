@@ -3,7 +3,7 @@ import { View, StyleSheet, Button } from "react-native";
 import Header from "../components/Header";
 import Formulario from "../components/Formulario";
 import ListaTarefas from "../components/ListaTarefas";
-import { db } from "../firebase/firebase-config";
+import { auth, db } from "../firebase/firebase-config";
 import {
   collection,
   getDocs,
@@ -17,7 +17,11 @@ const HomeScreen = () => {
   const tarefasCollectionRef = collection(db, "tarefas");
 
   const criarTarefa = async (titulo, conteudo) => {
+    const user = auth.currentUser; // Obtenha o usuário atualmente autenticado
+    const tarefasCollectionRef = collection(db, `users/${user.uid}/tasks`);
+
     await addDoc(tarefasCollectionRef, { titulo: titulo, conteudo: conteudo });
+
     const data = await getDocs(tarefasCollectionRef);
     setTarefas(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
   };
@@ -33,6 +37,9 @@ const HomeScreen = () => {
 
   useEffect(() => {
     const getTarefas = async () => {
+      const user = auth.currentUser;
+      const tarefasCollectionRef = collection(db, `users/${user.uid}/tasks`);
+
       const data = await getDocs(tarefasCollectionRef);
       setTarefas(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     };
