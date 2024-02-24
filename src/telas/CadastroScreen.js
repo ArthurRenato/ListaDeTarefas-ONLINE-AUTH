@@ -8,9 +8,10 @@ import {
 import { auth } from "../firebase/firebase-config";
 import { useNavigation } from "@react-navigation/native";
 
-const LoginScreen = () => {
+const CadastroScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
 
   const navigation = useNavigation();
 
@@ -23,11 +24,20 @@ const LoginScreen = () => {
     return unsubscribe;
   }, []);
 
-  const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
+  const handleSingUp = () => {
+    // Verificar se as senhas coincidem
+    if (password !== password2) {
+      alert("As senhas não coincidem.");
+      return;
+    }
+
+    // Se as senhas coincidirem, proceda com o cadastro
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
-        console.log("Logado:", user.email);
+        console.log("Cadastrado:", user.email);
+        // Adicione feedback ao usuário ou navegue para a tela desejada
+        // Exemplo: navigation.replace("Home");
       })
       .catch((error) => alert(error.message));
   };
@@ -49,25 +59,36 @@ const LoginScreen = () => {
           style={styles.input}
           secureTextEntry
         ></TextInput>
+
+        <TextInput
+          placeholder="Confirme a senha"
+          value={password2}
+          onChangeText={(text) => setPassword2(text)}
+          style={styles.input}
+          secureTextEntry
+        ></TextInput>
       </View>
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={handleLogin} style={styles.button}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-
         <TouchableOpacity
-          style={styles.buttonCadastro}
-          onPress={() => navigation.replace("Cadastro")}
+          onPress={handleSingUp}
+          style={[styles.button, styles.buttonOutline]}
         >
-          <Text>Cadastrar-se</Text>
+          <Text style={styles.buttonOutlineText}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity
+        style={styles.buttonLogin}
+        onPress={() => navigation.replace("Login")}
+      >
+        <Text>Já tem uma conta? Logar</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default LoginScreen;
+export default CadastroScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -103,13 +124,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  buttonOutline: {
+    backgroundColor: "white",
+    marginTop: 5,
+    borderColor: "#0782F9",
+    borderWidth: 2,
+  },
+
   buttonText: {
     color: "white",
     fontWeight: "700",
     fontSize: 16,
   },
 
-  buttonCadastro: {
-    marginTop: 40,
+  buttonOutlineText: {
+    color: "#0782F9",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+
+  buttonLogin: {
+    marginTop: 60,
   },
 });
