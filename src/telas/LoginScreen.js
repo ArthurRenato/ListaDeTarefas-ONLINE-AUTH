@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase-config";
 import { useNavigation } from "@react-navigation/native";
 
@@ -28,18 +25,23 @@ const LoginScreen = () => {
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Logado:", user.email);
+
+        // Navegue para a tela "Home" após o login bem-sucedido
+        navigation.replace("Home");
       })
       .catch((error) => alert(error.message));
   };
 
   return (
     <View style={styles.container}>
+      <Text>Lista de Tarefas</Text>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
+          autoCapitalize="none"
         ></TextInput>
 
         <TextInput
@@ -48,12 +50,14 @@ const LoginScreen = () => {
           onChangeText={(text) => setPassword(text)}
           style={styles.input}
           secureTextEntry
+          autoCapitalize="none"
         ></TextInput>
 
         <TouchableOpacity
           onPress={() => navigation.navigate("Recuperar Senha")}
+          style={{ marginTop: 10 }}
         >
-          <Text>Recuperar senha</Text>
+          <Text style={styles.linkTexto}>Recuperar senha</Text>
         </TouchableOpacity>
       </View>
 
@@ -63,10 +67,10 @@ const LoginScreen = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.buttonCadastro}
+          style={styles.linkContainer}
           onPress={() => navigation.navigate("Cadastro")}
         >
-          <Text>Cadastrar-se</Text>
+          <Text style={styles.linkTexto}>Cadastrar-se</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -80,6 +84,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#ecfeff",
   },
 
   inputContainer: {
@@ -92,6 +97,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 5,
+    borderColor: "#155e75",
+    borderWidth: 2,
   },
 
   buttonContainer: {
@@ -102,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#0891b2",
     width: "100%",
     padding: 15,
     borderRadius: 10,
@@ -117,5 +124,9 @@ const styles = StyleSheet.create({
 
   buttonCadastro: {
     marginTop: 40,
+  },
+
+  linkTexto: {
+    fontWeight: "bold",
   },
 });

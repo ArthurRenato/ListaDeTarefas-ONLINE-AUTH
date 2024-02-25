@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -16,7 +16,7 @@ const CadastroScreen = () => {
       alert(
         "Email de recuperação de senha enviado. Verifique sua caixa de entrada."
       );
-      navigation.replace("Login");
+      navigation.goBack();
     } catch (error) {
       alert(error.message);
     }
@@ -30,6 +30,7 @@ const CadastroScreen = () => {
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
+          autoCapitalize="none"
         ></TextInput>
       </View>
 

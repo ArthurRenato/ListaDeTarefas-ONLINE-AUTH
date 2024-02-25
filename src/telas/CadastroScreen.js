@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth"; // Only import createUserWithEmailAndPassword from "firebase/auth"
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+} from "react-native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import { collection, addDoc } from "firebase/firestore";
-import { auth, db } from "../firebase/firebase-config"; // Import only db from your firebase-config
+import { auth, db } from "../firebase/firebase-config";
 
 const CadastroScreen = () => {
   const [email, setEmail] = useState("");
@@ -12,15 +17,6 @@ const CadastroScreen = () => {
   const [password2, setPassword2] = useState("");
 
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        navigation.replace("Home");
-      }
-    });
-    return unsubscribe;
-  }, []);
 
   const handleSignUp = async () => {
     // Verificar se as senhas coincidem
@@ -31,26 +27,14 @@ const CadastroScreen = () => {
 
     // Se as senhas coincidirem, proceda com o cadastro
     try {
-      const userCredentials = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredentials.user;
-      console.log("Cadastrado, email:", user.email);
-      console.log("Cadastrado, user:", user);
+      // Crie o usuário sem fazer login automaticamente
+      await createUserWithEmailAndPassword(auth, email, password);
 
-      // Criar uma coleção específica para o usuário recém-cadastrado
-      const userTasksCollectionRef = collection(db, `users/${user.uid}/tasks`);
+      // Exiba um alerta informando que o cadastro foi realizado
+      alert("Cadastro realizado com sucesso!");
 
-      // Adicione uma tarefa de exemplo, se desejar
-      await addDoc(userTasksCollectionRef, {
-        titulo: "Exemplo de Tarefa",
-        conteudo: "Esta é uma tarefa de exemplo.",
-      });
-
-      // Adicione feedback ao usuário ou navegue para a tela desejada
-      // Exemplo: navigation.replace("Home");
+      // Navegue de volta para a tela de login
+      navigation.goBack();
     } catch (error) {
       alert(error.message);
     }
@@ -64,7 +48,8 @@ const CadastroScreen = () => {
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
-        ></TextInput>
+          autoCapitalize="none"
+        />
 
         <TextInput
           placeholder="Senha"
@@ -72,7 +57,8 @@ const CadastroScreen = () => {
           onChangeText={(text) => setPassword(text)}
           style={styles.input}
           secureTextEntry
-        ></TextInput>
+          autoCapitalize="none"
+        />
 
         <TextInput
           placeholder="Confirme a senha"
@@ -80,7 +66,8 @@ const CadastroScreen = () => {
           onChangeText={(text) => setPassword2(text)}
           style={styles.input}
           secureTextEntry
-        ></TextInput>
+          autoCapitalize="none"
+        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -138,19 +125,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
 
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-
   buttonOutlineText: {
     color: "#0782F9",
     fontWeight: "700",
     fontSize: 16,
-  },
-
-  buttonLogin: {
-    marginTop: 60,
   },
 });
